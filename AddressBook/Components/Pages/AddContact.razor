@@ -1,0 +1,41 @@
+@page "/add-contact"
+@using AddressBook.Models
+@using AddressBook.Services
+@inject ContactService contactService
+@inject NavigationManager NavigationManager
+
+<h3>Add Contact</h3>
+
+<EditForm Model="@newContact" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="name">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="newContact.Name" />
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <InputText id="email" type="email" class="form-control" @bind-Value="newContact.Email" />
+    </div>
+    <div class="form-group">
+        <label for="phone">Phone</label>
+        <InputText id="phone" class="form-control" @bind-Value="newContact.Phone" />
+    </div>
+    <div class="form-group">
+        <label for="address">Address</label>
+        <InputText id="address" class="form-control" @bind-Value="newContact.Address" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Contact</button>
+</EditForm>
+
+@code {
+    private Contact newContact = new Contact();
+
+    private async Task HandleValidSubmit()
+    {
+        await contactService.AddContactAsync(newContact);
+        NavigationManager.NavigateTo("/contacts");
+    }
+}

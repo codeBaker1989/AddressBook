@@ -1,0 +1,53 @@
+@page "/edit-contact/{id:int}"
+@inject ContactService contactService
+@inject NavigationManager NavigationManager
+
+@using AddressBook.Models
+@using AddressBook.Services
+
+<EditForm Model="@editContact" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="name">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="editContact.Name" />
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <InputText id="email" type="email" class="form-control" @bind-Value="editContact.Email" />
+    </div>
+    <div class="form-group">
+        <label for="phone">Phone</label>
+        <InputText id="phone" class="form-control" @bind-Value="editContact.Phone" />
+    </div>
+    <div class="form-group">
+        <label for="address">Address</label>
+        <InputText id="address" class="form-control" @bind-Value="editContact.Address" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</EditForm>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Contact? editContact;
+
+    protected override async Task OnInitializedAsync()
+    {
+        editContact = await contactService.GetContactByIdAsync(Id);
+        if (editContact == null)
+        {
+            NavigationManager.NavigateTo("/contacts");
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (editContact != null)
+        {
+            await contactService.UpdateContactAsync(editContact);
+            NavigationManager.NavigateTo("/contacts");
+        }
+    }
+}

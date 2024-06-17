@@ -1,0 +1,76 @@
+﻿@page "/"
+@using AddressBook.Models
+@using AddressBook.Services
+@inject NavigationManager NavigationManager
+@inject ContactService contactService
+
+<h3>Contacts</h3>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    @if (contacts == null)
+    {
+        <tr>
+            <td colspan="5">Loading...</td>
+        </tr>
+    }
+    else if (!contacts.Any())
+    {
+        <tr>
+            <td colspan="5">No contacts available.</td>
+        </tr>
+    }
+    else
+    {
+        @foreach (var contact in contacts)
+        {
+            <tr>
+                <td>@contact.Name</td>
+                <td>@contact.Email</td>
+                <td>@contact.Phone</td>
+                <td>@contact.Address</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="() => EditContact(contact.Id)">Edit</button>
+                    <button class="btn btn-danger" @onclick="() => DeleteContact(contact.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>
+
+<button class="btn btn-success" @onclick="AddContact">Add Contact</button>
+
+@code {
+    private List<Contact> contacts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        contacts = await contactService.GetContactsAsync(); // Correct gebruik van geïnjecteerde service
+    }
+
+    private void AddContact()
+    {
+        NavigationManager.NavigateTo("/add-contact");
+    }
+
+    private void EditContact(int id)
+    {
+        NavigationManager.NavigateTo($"/edit-contact/{id}");
+    }
+
+    private async Task DeleteContact(int id)
+    {
+        await contactService.DeleteContactAsync(id);
+        contacts = await contactService.GetContactsAsync();
+    }
+}
